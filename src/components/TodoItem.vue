@@ -9,7 +9,7 @@
       <span :class="[props.todo.isCompleted && 'todo-complted']">{{ props.todo.task }}</span>
     </td>
 
-    <td class="text-end">
+    <td class="text-end d-flex flex-column flex-md-row justify-content-md-end">
       <b-button
         @click="$bvModal.show('modal' + props.todo.id)"
         v-b-modal.modal-1
@@ -17,7 +17,7 @@
         >Edit
       </b-button>
       <button
-        :class="['btn  mx-2', props.todo.isCompleted ? 'btn-success' : 'btn-warning']"
+        :class="['btn  mx-2 my-1', props.todo.isCompleted ? 'btn-success' : 'btn-warning']"
         @click="toggleStateTodo"
         v-b-tooltip.hover :title="tooltipState"
       >
@@ -62,12 +62,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed , inject} from 'vue'
 
 const props = defineProps({
   todo: { id: String, task: String }
 })
-
+const swal = inject('$swal')
 const tooltipState = computed(() => props.todo.isCompleted ? 'Cick to switch to in progress' : ' Cick to switch to completed')
 const todo = reactive({ task: '', title: '' })
 
@@ -77,7 +77,15 @@ const editTodo = () => {
   emit('edit', { id: props.todo.id, ...todo })
 }
 const removeTodo = () => {
-  emit('remove', props.todo.id)
+  swal({
+    icon: 'question',
+    text: 'Etes vous sur de vouloir supprimer cette tache'
+  }).then(result => {
+    console.log(result)
+    if(result.isConfirmed) {
+        emit('remove', props.todo.id)
+    }
+  })
 }
 
 const toggleStateTodo = () => {

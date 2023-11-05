@@ -88,7 +88,8 @@
 <script setup>
 import TodoItem from './components/TodoItem.vue'
 import { v4 as uuidv4 } from 'uuid'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, inject } from 'vue'
+const swal = inject('$swal')
 
 const todo = reactive({ task: '', title: '' })
 let todoList = ref([])
@@ -98,12 +99,29 @@ const inProgressList = computed(() => todoList.value.filter(todo =>!todo.isCompl
  */
 const addTodo = () => {
   console.log(todo)
-  todoList.value.push({ id: uuidv4(), ...todo, isCompleted: false })
+   swal({
+    icon: 'question',
+    text: 'Etes vous sur de vouloir ajouter cette tache'
+  }).then(result => {
+    console.log(result)
+    if(result.isConfirmed) {
+       todoList.value.push({ id: uuidv4(), ...todo, isCompleted: false })
   todo.title = ''
   todo.task = ''
+  swal({
+    icon: 'success',
+    text: 'Ajout avec succès!'
+  })
+    }
+  })
+  
 }
 const removeTodo = (id) => {
   todoList.value = todoList.value.filter((todo) => todo.id !== id)
+   swal({
+    icon: 'success',
+    text: 'Suppression avec succès!'
+  })
 }
 
 /**
